@@ -60,7 +60,6 @@ const validateSession = async (sessionId) => {
   }
 }
 
-// Function to handle client session restoration
 const restoreSessions = async () => {
   try {
     if (mongodbUri) {
@@ -69,18 +68,21 @@ const restoreSessions = async () => {
         await mongoose.connect(mongodbUri)
       }
       logger.info('Connected to MongoDB. Restoring remote sessions...')
-      const collections = await mongoose.connection.db.listCollections({ name: 'whatsapp-RemoteAuth' }).toArray()
-      if (collections.length > 0) {
-        const sessionDocs = await mongoose.connection.db.collection('whatsapp-RemoteAuth').find({}).toArray()
-        for (const doc of sessionDocs) {
-          const match = doc._id.match(/^RemoteAuth-(.+)$/)
-          if (match) {
-            const sessionId = match[1]
-            logger.warn({ sessionId }, 'Existing remote session detected')
-            setupSession(sessionId).catch(err => {
-              logger.error({ sessionId, err }, 'Failed to restore remote session')
-            })
-          }
+      const collections = await mongoose.connection.db.listCollections().toArray()
+      const remoteSessionIds = []
+      for (const col of collections) {
+        const match = col.name.match(/^whatsapp-RemoteAuth-(.+)\.files$/)
+        if (match) {
+          remoteSessionIds.push(match[1])
+        }
+      }
+      
+      if (remoteSessionIds.length > 0) {
+        for (const sessionId of remoteSessionIds) {
+          logger.warn({ sessionId }, 'Existing remote session detected')
+          setupSession(sessionId).catch(err => {
+            logger.error({ sessionId, err }, 'Failed to restore remote session')
+          })
         }
       } else {
         logger.info('No remote sessions found in MongoDB.')
