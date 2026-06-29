@@ -130,7 +130,7 @@ const setupSession = async (sessionId) => {
         clientId: sessionId,
         store: store,
         backupSyncIntervalMs: 300000,
-        dataPath: sessionFolderPath
+        dataPath: './'
       })
     } else {
       // Disable the delete folder from the logout function (will be handled separately)
