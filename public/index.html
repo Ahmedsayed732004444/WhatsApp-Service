@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krafte - WhatsApp Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #25D366;
+            --primary-dark: #128C7E;
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative glowing orbs */
+        .card::before, .card::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--primary);
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+        .card::before { top: -50px; left: -50px; }
+        .card::after { bottom: -50px; right: -50px; background: #3b82f6; }
+
+        .logo-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 10px rgba(37, 211, 102, 0.4));
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #eab308; /* Yellow for checking */
+            box-shadow: 0 0 10px #eab308;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-badge.connected .status-dot { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .status-badge.disconnected .status-dot { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+
+        .qr-container {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .qr-box {
+            background: white;
+            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .qr-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-loader {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            font-weight: bold;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .connected-view {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 15px rgba(37, 211, 102, 0.4));
+            animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="logo-container">
+                <div class="logo-icon">🤖</div>
+                <h1>Krafte Service</h1>
+                <p class="subtitle">لوحة تحكم ربط الواتساب</p>
+            </div>
+
+            <div class="status-badge" id="statusBadge">
+                <div class="status-dot"></div>
+                <span id="statusText">جاري التحقق من الاتصال...</span>
+            </div>
+
+            <!-- QR Code View -->
+            <div class="qr-container" id="qrContainer">
+                <p style="margin-bottom: 1rem;">يرجى مسح الرمز ضوئياً لربط الواتساب</p>
+                <div class="qr-box">
+                    <div class="qr-loader" id="qrLoader">جاري تجهيز الباركود...</div>
+                    <img id="qrImage" src="" alt="WhatsApp QR Code" style="display: none;">
+                </div>
+                <button class="btn" onclick="checkStatus(true)">تحديث الباركود</button>
+            </div>
+
+            <!-- Connected View -->
+            <div class="connected-view" id="connectedView">
+                <div class="success-icon">✓</div>
+                <h3>ممتاز! الواتساب متصل</h3>
+                <p class="subtitle">الخدمة تعمل الآن ومستعدة لإرسال الرسائل التلقائية.</p>
+                <button class="btn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); box-shadow: none;" onclick="checkStatus(true)">تحقق مرة أخرى</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_KEY = 'Kj8mN2pL9qR4xT6v';
+        const SESSION_ID = 'mysession';
+        const BASE_URL = window.location.origin + '/api';
+
+        const headers = {
+            'x-api-key': API_KEY,
+            'Content-Type': 'application/json'
+        };
+
+        // DOM Elements
+        const statusBadge = document.getElementById('statusBadge');
+        const statusText = document.getElementById('statusText');
+        const qrContainer = document.getElementById('qrContainer');
+        const connectedView = document.getElementById('connectedView');
+        const qrImage = document.getElementById('qrImage');
+        const qrLoader = document.getElementById('qrLoader');
+
+        async function fetchAPI(endpoint, method = 'GET') {
+            try {
+                const response = await fetch(`${BASE_URL}${endpoint}`, { method, headers });
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${endpoint}:`, error);
+                return { success: false, message: error.message };
+            }
+        }
+
+        function setStatus(state, text) {
+            statusBadge.className = 'status-badge ' + state;
+            statusText.innerText = text;
+        }
+
+        async function checkStatus(forceStart = false) {
+            // Reset UI
+            setStatus('checking', 'جاري التحقق من الاتصال...');
+            qrContainer.style.display = 'none';
+            connectedView.style.display = 'none';
+
+            // 1. Get Status
+            const statusRes = await fetchAPI(`/session/status/${SESSION_ID}`);
+            
+            if (statusRes.success && statusRes.state === 'CONNECTED') {
+                setStatus('connected', 'متصل ويعمل');
+                connectedView.style.display = 'flex';
+                return;
+            }
+
+            // 2. If not connected, start session (or it might be already starting)
+            setStatus('disconnected', 'غير متصل - جاري جلب الباركود');
+            qrContainer.style.display = 'flex';
+            qrImage.style.display = 'none';
+            qrLoader.style.display = 'flex';
+            qrLoader.innerText = 'جاري بدء الجلسة... (قد يستغرق ثواني)';
+
+            if (forceStart || statusRes.message === 'session_not_found') {
+                await fetchAPI(`/session/start/${SESSION_ID}`);
+                // Wait a bit for QR to generate
+                await new Promise(r => setTimeout(r, 4000));
+            }
+
+            // 3. Keep trying to fetch QR
+            fetchQRCode();
+        }
+
+        async function fetchQRCode() {
+            let retries = 5;
+            while (retries > 0) {
+                const qrRes = await fetchAPI(`/session/qr/${SESSION_ID}`);
+                if (qrRes.success && qrRes.qr) {
+                    qrLoader.style.display = 'none';
+                    // We can use the /image endpoint directly as image source
+                    const imgUrl = `${BASE_URL}/session/qr/${SESSION_ID}/image?t=${new Date().getTime()}`;
+                    
+                    // Preload image to avoid flicker
+                    const img = new Image();
+                    img.onload = () => {
+                        qrImage.src = imgUrl;
+                        qrImage.style.display = 'block';
+                    };
+                    img.src = imgUrl;
+                    
+                    // Keep checking status every 5 seconds to see if user scanned
+                    startStatusPolling();
+                    return;
+                }
+                
+                qrLoader.innerText = `جاري توليد الباركود... (${retries})`;
+                await new Promise(r => setTimeout(r, 3000));
+                retries--;
+            }
+            
+            qrLoader.innerText = 'فشل جلب الباركود. يرجى التحديث.';
+        }
+
+        let pollInterval = null;
+        function startStatusPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(async () => {
+                const res = await fetchAPI(`/session/status/${SESSION_ID}`);
+                if (res.success && res.state === 'CONNECTED') {
+                    clearInterval(pollInterval);
+                    checkStatus(); // Reload UI to show success
+                }
+            }, 5000);
+        }
+
+        // Initialize
+        window.onload = () => checkStatus();
+    </script>
+</body>
+</html>

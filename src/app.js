@@ -22,6 +22,9 @@ app.use(cors({
   credentials: true
 }))
 
+// Serve static UI dashboard
+app.use(express.static('public'))
+
 // Mount routes with configurable base path
 app.use(basePath, routes)
 
