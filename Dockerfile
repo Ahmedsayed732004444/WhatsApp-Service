@@ -44,6 +44,7 @@ COPY server.js ./
 COPY LICENSE ./
 COPY swagger.json ./
 COPY src/ ./src/
+COPY public/ ./public/
 
 # Create sessions folder and set broad permissions for Hugging Face non-root user
 RUN mkdir -p /usr/src/app/sessions && chmod -R 777 /usr/src/app
