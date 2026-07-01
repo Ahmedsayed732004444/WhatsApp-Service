@@ -23,7 +23,8 @@ app.use(cors({
 }))
 
 // Serve static UI dashboard
-app.use(express.static('public'))
+const path = require('path')
+app.use(express.static(path.join(__dirname, '../public')))
 
 // Mount routes with configurable base path
 app.use(basePath, routes)
